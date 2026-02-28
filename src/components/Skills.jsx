@@ -375,6 +375,7 @@ const Skills = () => {
   }
 
   const handleTouchStart = (e) => {
+    e.preventDefault()
     isDraggingRef.current = true
     velocityRef.current = { x: 0, y: 0 }
     lastMouseRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -382,6 +383,7 @@ const Skills = () => {
 
   const handleTouchMove = (e) => {
     if (!isDraggingRef.current) return
+    e.preventDefault()
     const deltaX = e.touches[0].clientX - lastMouseRef.current.x
     const deltaY = e.touches[0].clientY - lastMouseRef.current.y
     
