@@ -184,9 +184,10 @@ const Skills = () => {
   const globeContainerRef = useRef(null)
   
   // Detect mobile for responsive sizing
+  // Mobile: SVG scales from 500px to 380px, icon positions must match visual wireframe
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-  const globeRadius = isMobile ? 150 : 220
-  const icoRadius = isMobile ? 130 : 180
+  const globeRadius = isMobile ? 110 : 220  // Match visual wireframe positioning
+  const icoRadius = isMobile ? 140 : 180
   
   const icosahedron = useMemo(() => generateIcosahedron(icoRadius, 1), [icoRadius])  // Reduced subdivisions for performance
   const particles = useMemo(() => generateParticles(15), [])  // Reduced for performance
@@ -215,8 +216,8 @@ const Skills = () => {
     let linesCache = null
     let itemsCache = null
     const isMobileDevice = window.innerWidth <= 768
-    const radius = isMobileDevice ? 150 : 220
-    const icoRadiusAnim = isMobileDevice ? 130 : 180
+    const radius = isMobileDevice ? 110 : 220
+    const icoRadiusAnim = isMobileDevice ? 140 : 180
     const DEG_TO_RAD = Math.PI / 180
     // Mobile: reduce update frequency for better performance
     const opacityUpdateInterval = isMobileDevice ? 8 : 4
