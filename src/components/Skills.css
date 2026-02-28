@@ -84,6 +84,7 @@
   justify-content: center;
   cursor: grab;
   user-select: none;
+  contain: layout style paint;
 }
 
 .globe-container:active {
@@ -95,6 +96,8 @@
   width: 500px;
   height: 500px;
   pointer-events: none;
+  shape-rendering: optimizeSpeed;
+  will-change: contents;
 }
 
 .skills-cloud {

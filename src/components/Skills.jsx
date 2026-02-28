@@ -1,4 +1,4 @@
-import { useRef, useEffect, useMemo } from 'react'
+import { useRef, useEffect, useMemo, useLayoutEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { 
   FaReact, FaNodeJs, FaPython, FaJs, FaLaravel, FaGitAlt, 
@@ -23,12 +23,6 @@ const skills = [
   { name: 'Git', icon: FaGitAlt, color: '#f05032' },
   { name: 'Docker', icon: FaDocker, color: '#2496ed' },
   { name: 'FastAPI', icon: SiFastapi, color: '#009688' },
-  { name: 'Express', icon: SiExpress, color: '#ffffff' },
-  { name: 'PostgreSQL', icon: SiPostgresql, color: '#336791' },
-  { name: 'TypeScript', icon: SiTypescript, color: '#3178c6' },
-  { name: 'HTML5', icon: FaHtml5, color: '#e34f26' },
-  { name: 'CSS3', icon: FaCss3Alt, color: '#1572b6' },
-  { name: 'REST APIs', icon: FaDatabase, color: '#6366f1' },
 ]
 
 // Generate icosahedron vertices and edges
@@ -133,50 +127,74 @@ const Skills = () => {
   const velocityRef = useRef({ x: 0, y: 0 })
   const isDraggingRef = useRef(false)
   const lastMouseRef = useRef({ x: 0, y: 0 })
+  const isVisibleRef = useRef(false)
   
   // DOM refs for direct manipulation (no React re-renders)
   const svgRef = useRef(null)
   const skillsCloudRef = useRef(null)
+  const globeContainerRef = useRef(null)
   
-  const icosahedron = useMemo(() => generateIcosahedron(180), [])
-  const particles = useMemo(() => generateParticles(25), [])  // Reduced for performance
+  const icosahedron = useMemo(() => generateIcosahedron(180, 1), [])  // Reduced subdivisions for performance
+  const particles = useMemo(() => generateParticles(15), [])  // Reduced for performance
   const skillPositions = useMemo(() => 
     skills.map((_, index) => getSphericalPosition(index, skills.length, 220)), 
   [])
 
-  // 3D rotation transform function
-  const rotatePoint = useRef((x, y, z, rotX, rotY) => {
-    const radX = (rotX * Math.PI) / 180
-    const radY = (rotY * Math.PI) / 180
+  // Track visibility for animation pause
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting
+      },
+      { threshold: 0.1 }
+    )
     
-    let x1 = x * Math.cos(radY) - z * Math.sin(radY)
-    let z1 = x * Math.sin(radY) + z * Math.cos(radY)
-    let y1 = y * Math.cos(radX) - z1 * Math.sin(radX)
-    let z2 = y * Math.sin(radX) + z1 * Math.cos(radX)
+    if (globeContainerRef.current) {
+      observer.observe(globeContainerRef.current)
+    }
     
-    return { x: x1, y: y1, z: z2 }
-  }).current
+    return () => observer.disconnect()
+  }, [])
 
   // High-performance animation loop with direct DOM updates
-  useEffect(() => {
+  useLayoutEffect(() => {
     let animationId
-    let lastTime = performance.now()
+    let lastTime = 0
     let linesCache = null
     let itemsCache = null
     const radius = 220
-    const targetFPS = 60
-    const frameTime = 1000 / targetFPS
+    const DEG_TO_RAD = Math.PI / 180
+    
+    // Pre-allocate transform string builder
+    let frameCount = 0
     
     const animate = (currentTime) => {
+      // Always schedule next frame first for consistent timing
+      animationId = requestAnimationFrame(animate)
+      
+      // Skip first frame to establish timing
+      if (lastTime === 0) {
+        lastTime = currentTime
+        return
+      }
+      
+      // Skip if not visible (saves CPU)
+      if (!isVisibleRef.current) {
+        lastTime = currentTime
+        return
+      }
+      
       const deltaTime = currentTime - lastTime
-      const timeScale = deltaTime / frameTime // Normalize to 60fps
+      // Cap deltaTime to prevent huge jumps
+      const cappedDelta = Math.min(deltaTime, 50)
+      const timeScale = cappedDelta / 16.667 // Normalize to 60fps
       
       const vel = velocityRef.current
       const rot = rotationRef.current
       
       // Physics update (frame-rate independent)
       if (!isDraggingRef.current) {
-        rot.y += 0.3 * timeScale
+        rot.y += 0.25 * timeScale
         if (Math.abs(vel.x) > 0.01 || Math.abs(vel.y) > 0.01) {
           rot.x = Math.max(-60, Math.min(60, rot.x + vel.x * timeScale))
           rot.y += vel.y * timeScale
@@ -184,6 +202,23 @@ const Skills = () => {
           vel.x *= friction
           vel.y *= friction
         }
+      }
+      
+      // Pre-calculate trig values (big perf win)
+      const radX = rot.x * DEG_TO_RAD
+      const radY = rot.y * DEG_TO_RAD
+      const cosX = Math.cos(radX)
+      const sinX = Math.sin(radX)
+      const cosY = Math.cos(radY)
+      const sinY = Math.sin(radY)
+      
+      // Inline rotation function with cached trig
+      const rotatePointFast = (x, y, z) => {
+        const x1 = x * cosY - z * sinY
+        const z1 = x * sinY + z * cosY
+        const y1 = y * cosX - z1 * sinX
+        const z2 = y * sinX + z1 * cosX
+        return { x: x1, y: y1, z: z2 }
       }
       
       // Cache DOM queries (only once)
@@ -194,17 +229,17 @@ const Skills = () => {
         itemsCache = skillsCloudRef.current.querySelectorAll('.skill-item')
       }
       
-      // Direct SVG line updates
+      // Update SVG lines
       if (linesCache) {
         const edges = icosahedron.edges
         const verts = icosahedron.vertices
-        for (let i = 0; i < edges.length; i++) {
+        const len = edges.length
+        for (let i = 0; i < len; i++) {
           const edge = edges[i]
           const v1 = verts[edge[0]]
           const v2 = verts[edge[1]]
-          const p1 = rotatePoint(v1[0], v1[1], v1[2], rot.x, rot.y)
-          const p2 = rotatePoint(v2[0], v2[1], v2[2], rot.x, rot.y)
-          const opacity = ((p1.z + p2.z) / 2 + 180) / 360 * 0.6 + 0.15
+          const p1 = rotatePointFast(v1[0], v1[1], v1[2])
+          const p2 = rotatePointFast(v2[0], v2[1], v2[2])
           
           const line = linesCache[i]
           if (line) {
@@ -212,35 +247,43 @@ const Skills = () => {
             line.setAttribute('y1', p1.y)
             line.setAttribute('x2', p2.x)
             line.setAttribute('y2', p2.y)
-            line.setAttribute('opacity', opacity)
+            // Update opacity less frequently (every 3 frames)
+            if (frameCount % 3 === 0) {
+              line.setAttribute('opacity', ((p1.z + p2.z) / 2 + 180) / 360 * 0.6 + 0.15)
+            }
           }
         }
       }
       
-      // Direct skill item updates
+      // Update skill items
       if (itemsCache) {
-        for (let i = 0; i < skillPositions.length; i++) {
+        const len = skillPositions.length
+        for (let i = 0; i < len; i++) {
           const pos = skillPositions[i]
-          const rotated = rotatePoint(pos.x, pos.y, pos.z, rot.x, rot.y)
+          const rotated = rotatePointFast(pos.x, pos.y, pos.z)
           const scale = (rotated.z + radius) / (radius * 2) * 0.6 + 0.4
-          const opacity = (rotated.z + radius) / (radius * 2) * 0.8 + 0.2
           
           const item = itemsCache[i]
           if (item) {
-            item.style.transform = `translate3d(${rotated.x}px, ${rotated.y}px, 0) scale(${scale})`
-            item.style.opacity = opacity
-            item.style.zIndex = Math.round(rotated.z + radius)
+            item.style.transform = `translate3d(${rotated.x | 0}px, ${rotated.y | 0}px, 0) scale(${scale.toFixed(2)})`
+            // Update opacity/zIndex less frequently (every 2 frames)
+            if (frameCount % 2 === 0) {
+              item.style.opacity = ((rotated.z + radius) / (radius * 2) * 0.8 + 0.2).toFixed(2)
+              item.style.zIndex = (rotated.z + radius) | 0
+            }
           }
         }
       }
       
+      frameCount++
       lastTime = currentTime
-      animationId = requestAnimationFrame(animate)
     }
     
+    // Start animation immediately
+    isVisibleRef.current = true // Start visible to render initial state
     animationId = requestAnimationFrame(animate)
     return () => cancelAnimationFrame(animationId)
-  }, [icosahedron, skillPositions, rotatePoint])
+  }, [icosahedron, skillPositions])
 
   const handleMouseDown = (e) => {
     isDraggingRef.current = true
@@ -333,6 +376,7 @@ const Skills = () => {
         </motion.div>
 
         <motion.div 
+          ref={globeContainerRef}
           className="globe-container"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}

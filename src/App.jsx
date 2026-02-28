@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import './App.css'
@@ -10,6 +10,9 @@ const Experience = lazy(() => import('./components/Experience'))
 const Projects = lazy(() => import('./components/Projects'))
 const Contact = lazy(() => import('./components/Contact'))
 const Footer = lazy(() => import('./components/Footer'))
+
+// Preload Skills component for smoother experience (it has heavy animations)
+const preloadSkills = () => import('./components/Skills')
 
 // Minimal loading fallback
 const SectionLoader = () => (
@@ -32,6 +35,12 @@ const SectionLoader = () => (
 )
 
 function App() {
+  // Preload Skills after initial render
+  useEffect(() => {
+    const timer = setTimeout(preloadSkills, 100)
+    return () => clearTimeout(timer)
+  }, [])
+  
   return (
     <div className="app">
       <Navbar />
