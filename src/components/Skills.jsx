@@ -183,9 +183,14 @@ const Skills = () => {
   const skillsCloudRef = useRef(null)
   const globeContainerRef = useRef(null)
   
-  const icosahedron = useMemo(() => generateIcosahedron(180, 1), [])  // Reduced subdivisions for performance
+  // Detect mobile for responsive sizing
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const globeRadius = isMobile ? 150 : 220
+  const icoRadius = isMobile ? 130 : 180
+  
+  const icosahedron = useMemo(() => generateIcosahedron(icoRadius, 1), [icoRadius])  // Reduced subdivisions for performance
   const particles = useMemo(() => generateParticles(15), [])  // Reduced for performance
-  const skillPositions = useMemo(() => getSkillPositions(skills, 220), [])
+  const skillPositions = useMemo(() => getSkillPositions(skills, globeRadius), [globeRadius])
 
   // Track visibility for animation pause
   useEffect(() => {
@@ -209,8 +214,14 @@ const Skills = () => {
     let lastTime = 0
     let linesCache = null
     let itemsCache = null
-    const radius = 220
+    const isMobileDevice = window.innerWidth <= 768
+    const radius = isMobileDevice ? 150 : 220
+    const icoRadiusAnim = isMobileDevice ? 130 : 180
     const DEG_TO_RAD = Math.PI / 180
+    // Mobile: reduce update frequency for better performance
+    const opacityUpdateInterval = isMobileDevice ? 8 : 4
+    const lineOpacityInterval = isMobileDevice ? 6 : 3
+    const maxRotX = isMobileDevice ? 30 : 60  // Constrain vertical motion on mobile
     
     // Pre-allocate transform string builder
     let frameCount = 0
@@ -243,7 +254,7 @@ const Skills = () => {
       if (!isDraggingRef.current) {
         rot.y += 0.15 * timeScale
         if (Math.abs(vel.x) > 0.01 || Math.abs(vel.y) > 0.01) {
-          rot.x = Math.max(-60, Math.min(60, rot.x + vel.x * timeScale))
+          rot.x = Math.max(-maxRotX, Math.min(maxRotX, rot.x + vel.x * timeScale))
           rot.y += vel.y * timeScale
           const friction = Math.pow(0.92, timeScale)
           vel.x *= friction
@@ -294,9 +305,9 @@ const Skills = () => {
             line.setAttribute('y1', p1.y)
             line.setAttribute('x2', p2.x)
             line.setAttribute('y2', p2.y)
-            // Update opacity less frequently (every 3 frames)
-            if (frameCount % 3 === 0) {
-              line.setAttribute('opacity', ((p1.z + p2.z) / 2 + 180) / 360 * 0.6 + 0.15)
+            // Update opacity less frequently (every 3 frames on desktop, 6 on mobile)
+            if (frameCount % lineOpacityInterval === 0) {
+              line.setAttribute('opacity', ((p1.z + p2.z) / 2 + icoRadiusAnim) / (icoRadiusAnim * 2) * 0.6 + 0.15)
             }
           }
         }
@@ -314,8 +325,8 @@ const Skills = () => {
           const item = itemsCache[i]
           if (item) {
             item.style.transform = `translate3d(${rotated.x}px, ${rotated.y}px, 0) scale(${scale})`
-            // Update opacity/zIndex less frequently (every 4 frames)
-            if (frameCount % 4 === 0) {
+            // Update opacity/zIndex less frequently (every 4 frames desktop, 8 mobile)
+            if (frameCount % opacityUpdateInterval === 0) {
               item.style.opacity = (rotated.z + radius) / (radius * 2) * 0.6 + 0.4
               item.style.zIndex = (rotated.z + radius) | 0
             }
