@@ -194,11 +194,11 @@ const Skills = () => {
       
       // Physics update (frame-rate independent)
       if (!isDraggingRef.current) {
-        rot.y += 0.25 * timeScale
+        rot.y += 0.15 * timeScale
         if (Math.abs(vel.x) > 0.01 || Math.abs(vel.y) > 0.01) {
           rot.x = Math.max(-60, Math.min(60, rot.x + vel.x * timeScale))
           rot.y += vel.y * timeScale
-          const friction = Math.pow(0.94, timeScale)
+          const friction = Math.pow(0.92, timeScale)
           vel.x *= friction
           vel.y *= friction
         }
@@ -261,14 +261,15 @@ const Skills = () => {
         for (let i = 0; i < len; i++) {
           const pos = skillPositions[i]
           const rotated = rotatePointFast(pos.x, pos.y, pos.z)
-          const scale = (rotated.z + radius) / (radius * 2) * 0.6 + 0.4
+          // Scale with reduced range to minimize size changes
+          const scale = (rotated.z + radius) / (radius * 2) * 0.4 + 0.6
           
           const item = itemsCache[i]
           if (item) {
-            item.style.transform = `translate3d(${rotated.x | 0}px, ${rotated.y | 0}px, 0) scale(${scale.toFixed(2)})`
-            // Update opacity/zIndex less frequently (every 2 frames)
-            if (frameCount % 2 === 0) {
-              item.style.opacity = ((rotated.z + radius) / (radius * 2) * 0.8 + 0.2).toFixed(2)
+            item.style.transform = `translate3d(${rotated.x}px, ${rotated.y}px, 0) scale(${scale})`
+            // Update opacity/zIndex less frequently (every 4 frames)
+            if (frameCount % 4 === 0) {
+              item.style.opacity = (rotated.z + radius) / (radius * 2) * 0.6 + 0.4
               item.style.zIndex = (rotated.z + radius) | 0
             }
           }

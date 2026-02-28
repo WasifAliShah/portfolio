@@ -116,12 +116,8 @@
   align-items: center;
   gap: 0.4rem;
   pointer-events: auto;
-  will-change: transform, opacity;
   cursor: pointer;
-  transition: filter 0.15s ease-out;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  contain: layout style;
+  will-change: transform;
 }
 
 .skill-item:hover {
@@ -139,21 +135,18 @@
 }
 
 .skill-icon {
-  font-size: 3rem;
+  font-size: 3.5rem;
   filter: drop-shadow(0 0 15px currentColor);
   transition: transform 0.15s ease-out, filter 0.15s ease-out;
-  transform: translateZ(0);
-  will-change: transform, filter;
 }
 
 .skill-name {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--light);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
   transition: transform 0.15s ease-out, color 0.15s ease-out;
-  transform: translateZ(0);
 }
 
 .globe-hint {
@@ -188,7 +181,7 @@
   }
 
   .skill-icon {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
 
   .skill-name {
