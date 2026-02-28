@@ -282,10 +282,12 @@
   transform: translateX(-50%);
   color: var(--gray);
   font-size: 2.5rem;
-  cursor: pointer;
+  cursor: default;
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 /* Responsive */
@@ -334,6 +336,10 @@
   .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .hero-scroll-arrow {
+    display: none;
   }
 
   .editor-body {

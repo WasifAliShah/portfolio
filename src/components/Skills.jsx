@@ -2,27 +2,40 @@ import { useRef, useEffect, useMemo, useLayoutEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { 
   FaReact, FaNodeJs, FaPython, FaJs, FaLaravel, FaGitAlt, 
-  FaDocker, FaHtml5, FaCss3Alt, FaDatabase
+  FaDocker, FaHtml5, FaCss3Alt, FaAws
 } from 'react-icons/fa'
 import { 
   SiMongodb, SiDotnet, SiMysql, SiTailwindcss, SiFastapi, 
-  SiExpress, SiPostgresql, SiTypescript
+  SiExpress, SiPostgresql, SiTypescript, SiFirebase
 } from 'react-icons/si'
 import './Skills.css'
 
+// Organized by position on sphere
 const skills = [
-  { name: 'React', icon: FaReact, color: '#61dafb' },
-  { name: 'Node.js', icon: FaNodeJs, color: '#68a063' },
-  { name: 'Python', icon: FaPython, color: '#3776ab' },
-  { name: 'JavaScript', icon: FaJs, color: '#f7df1e' },
-  { name: 'MongoDB', icon: SiMongodb, color: '#47a248' },
-  { name: 'Laravel', icon: FaLaravel, color: '#ff2d20' },
-  { name: '.NET', icon: SiDotnet, color: '#512bd4' },
-  { name: 'MySQL', icon: SiMysql, color: '#4479a1' },
-  { name: 'Tailwind', icon: SiTailwindcss, color: '#06b6d4' },
-  { name: 'Git', icon: FaGitAlt, color: '#f05032' },
-  { name: 'Docker', icon: FaDocker, color: '#2496ed' },
-  { name: 'FastAPI', icon: SiFastapi, color: '#009688' },
+  // Top pole
+  { name: 'React', icon: FaReact, color: '#61dafb', position: 'top' },
+  
+  // Upper ring - Frontend (4 items)
+  { name: 'JavaScript', icon: FaJs, color: '#f7df1e', ring: 0 },
+  { name: 'TypeScript', icon: SiTypescript, color: '#3178c6', ring: 0 },
+  { name: 'Tailwind', icon: SiTailwindcss, color: '#06b6d4', ring: 0 },
+  { name: 'HTML/CSS', icon: FaHtml5, color: '#e34f26', ring: 0 },
+  
+  // Middle ring - Backend (5 items)
+  { name: 'Node.js', icon: FaNodeJs, color: '#68a063', ring: 1 },
+  { name: 'Python', icon: FaPython, color: '#3776ab', ring: 1 },
+  { name: 'Laravel', icon: FaLaravel, color: '#ff2d20', ring: 1 },
+  { name: '.NET', icon: SiDotnet, color: '#512bd4', ring: 1 },
+  { name: 'FastAPI', icon: SiFastapi, color: '#009688', ring: 1 },
+  
+  // Lower ring - Database & DevOps (4 items)
+  { name: 'MongoDB', icon: SiMongodb, color: '#47a248', ring: 2 },
+  { name: 'PostgreSQL', icon: SiPostgresql, color: '#336791', ring: 2 },
+  { name: 'MySQL', icon: SiMysql, color: '#4479a1', ring: 2 },
+  { name: 'Docker', icon: FaDocker, color: '#2496ed', ring: 2 },
+  
+  // Bottom pole
+  { name: 'Git', icon: FaGitAlt, color: '#f05032', position: 'bottom' },
 ]
 
 // Generate icosahedron vertices and edges
@@ -94,16 +107,52 @@ const generateIcosahedron = (radius, subdivisions = 2) => {
   return { vertices, edges: [...edges].map(e => e.split(',').map(Number)) }
 }
 
-// Calculate spherical positions for skills
-const getSphericalPosition = (index, total, radius) => {
-  const phi = Math.acos(1 - 2 * (index + 0.5) / total)
-  const theta = Math.PI * (1 + Math.sqrt(5)) * index
+// Calculate ring-based positions for organized skill placement
+const getSkillPositions = (skillsArray, radius) => {
+  // Group skills by ring
+  const rings = [[], [], []]
+  skillsArray.forEach((skill, idx) => {
+    if (skill.ring !== undefined) {
+      rings[skill.ring].push(idx)
+    }
+  })
   
-  return {
-    x: radius * Math.sin(phi) * Math.cos(theta),
-    y: radius * Math.cos(phi),
-    z: radius * Math.sin(phi) * Math.sin(theta)
-  }
+  const positions = []
+  
+  // Ring heights (latitude): upper, middle, lower
+  const ringLatitudes = [0.55, 0, -0.55]
+  
+  skillsArray.forEach((skill, idx) => {
+    // Handle pole positions
+    if (skill.position === 'top') {
+      positions.push({ x: 0, y: radius * 0.95, z: 0 })
+      return
+    }
+    if (skill.position === 'bottom') {
+      positions.push({ x: 0, y: -radius * 0.95, z: 0 })
+      return
+    }
+    
+    const ring = skill.ring
+    const itemsInRing = rings[ring]
+    const indexInRing = itemsInRing.indexOf(idx)
+    const totalInRing = itemsInRing.length
+    
+    // Evenly space around the ring with offset per ring
+    const ringOffset = ring * (Math.PI / 4)
+    const theta = (2 * Math.PI * indexInRing / totalInRing) + ringOffset
+    
+    const y = ringLatitudes[ring] * radius
+    const ringRadius = Math.sqrt(1 - ringLatitudes[ring] ** 2) * radius
+    
+    positions.push({
+      x: ringRadius * Math.cos(theta),
+      y: y,
+      z: ringRadius * Math.sin(theta)
+    })
+  })
+  
+  return positions
 }
 
 // Generate random particles (reduced for performance)
@@ -136,9 +185,7 @@ const Skills = () => {
   
   const icosahedron = useMemo(() => generateIcosahedron(180, 1), [])  // Reduced subdivisions for performance
   const particles = useMemo(() => generateParticles(15), [])  // Reduced for performance
-  const skillPositions = useMemo(() => 
-    skills.map((_, index) => getSphericalPosition(index, skills.length, 220)), 
-  [])
+  const skillPositions = useMemo(() => getSkillPositions(skills, 220), [])
 
   // Track visibility for animation pause
   useEffect(() => {
