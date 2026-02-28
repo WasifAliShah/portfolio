@@ -76,10 +76,12 @@
   padding: 0.875rem 2rem;
   border-radius: 0.5rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background 0.2s ease-out, color 0.2s ease-out;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .btn-primary {
@@ -88,7 +90,7 @@
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
 }
 
@@ -100,7 +102,7 @@
 .btn-outline:hover {
   background: var(--primary);
   color: white;
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
 }
 
 .hero-socials {
@@ -119,7 +121,9 @@
   justify-content: center;
   font-size: 1.25rem;
   color: var(--primary);
-  transition: all 0.3s ease;
+  transition: transform 0.15s ease-out, background 0.15s ease-out, color 0.15s ease-out, border-color 0.15s ease-out;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .social-link:hover {
@@ -244,7 +248,9 @@
   border-radius: 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background 0.2s ease-out;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .editor-btn.primary {
@@ -253,7 +259,7 @@
 }
 
 .editor-btn.primary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
   box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
 }
 
@@ -265,7 +271,7 @@
 
 .editor-btn.secondary:hover {
   background: rgba(99, 102, 241, 0.2);
-  transform: translateY(-2px);
+  transform: translateY(-2px) translateZ(0);
 }
 
 /* Scroll Arrow */

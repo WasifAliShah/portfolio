@@ -92,7 +92,7 @@
 .contact-social-link:hover {
   background: var(--primary);
   color: white;
-  transform: translateY(-4px) scale(1.1);
+  transform: translateY(-4px) scale(1.1) translateZ(0);
   box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
 }
 
@@ -131,7 +131,8 @@
   color: var(--light);
   font-family: inherit;
   font-size: 0.95rem;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out, background 0.2s ease-out;
+  transform: translateZ(0);
 }
 
 .form-group input::placeholder,

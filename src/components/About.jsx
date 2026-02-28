@@ -19,9 +19,9 @@ const About = () => {
     <section id="about" className="about" ref={ref}>
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <h2 className="section-title">About Me</h2>
         </motion.div>
@@ -29,9 +29,9 @@ const About = () => {
         <div className="about-content">
           <motion.div 
             className="about-text"
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
             <p>
               Passionate full-stack developer with expertise in modern web technologies. 
@@ -60,16 +60,16 @@ const About = () => {
 
           <motion.div 
             className="about-highlights"
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
+            transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
           >
             {highlights.map((item, index) => (
               <motion.div 
                 key={index} 
                 className="highlight-card"
-                whileHover={{ scale: 1.05, y: -5 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                whileHover={{ scale: 1.03, y: -3 }}
+                transition={{ duration: 0.15 }}
               >
                 <div className="highlight-icon">{item.icon}</div>
                 <h3>{item.title}</h3>

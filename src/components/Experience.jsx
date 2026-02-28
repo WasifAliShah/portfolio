@@ -26,9 +26,9 @@ const Experience = () => {
     <section id="experience" className="experience" ref={ref}>
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <h2 className="section-title">Work Experience</h2>
           <p className="section-subtitle">My professional journey</p>
@@ -39,9 +39,9 @@ const Experience = () => {
             <motion.div
               key={index}
               className={`timeline-item ${index % 2 === 0 ? 'left' : 'right'}`}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+              initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
               animate={isInView ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
+              transition={{ duration: 0.4, delay: index * 0.1, ease: 'easeOut' }}
             >
               <div className="timeline-content">
                 <div className="timeline-header">

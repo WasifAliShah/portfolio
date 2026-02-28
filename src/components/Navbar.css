@@ -5,7 +5,9 @@
   right: 0;
   z-index: 1000;
   padding: 1rem 0;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease-out, box-shadow 0.2s ease-out;
+  transform: translateZ(0);
+  will-change: background, box-shadow;
 }
 
 .navbar.scrolled {
@@ -38,7 +40,7 @@
 .nav-links a {
   position: relative;
   font-weight: 500;
-  transition: color 0.3s ease;
+  transition: color 0.15s ease-out;
 }
 
 .nav-links a::after {
@@ -49,7 +51,7 @@
   width: 0;
   height: 2px;
   background: var(--gradient);
-  transition: width 0.3s ease;
+  transition: width 0.2s ease-out;
 }
 
 .nav-links a:hover {

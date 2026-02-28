@@ -112,15 +112,15 @@ const getSphericalPosition = (index, total, radius) => {
   }
 }
 
-// Generate random particles
+// Generate random particles (reduced for performance)
 const generateParticles = (count) => {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 2 + 1,
-    opacity: Math.random() * 0.5 + 0.1,
-    duration: Math.random() * 20 + 10
+    opacity: Math.random() * 0.3 + 0.1,
+    duration: Math.random() * 30 + 20
   }))
 }
 
@@ -139,7 +139,7 @@ const Skills = () => {
   const skillsCloudRef = useRef(null)
   
   const icosahedron = useMemo(() => generateIcosahedron(180), [])
-  const particles = useMemo(() => generateParticles(80), [])
+  const particles = useMemo(() => generateParticles(25), [])  // Reduced for performance
   const skillPositions = useMemo(() => 
     skills.map((_, index) => getSphericalPosition(index, skills.length, 220)), 
   [])
@@ -227,7 +227,7 @@ const Skills = () => {
           
           const item = itemsCache[i]
           if (item) {
-            item.style.transform = `translate(${rotated.x}px, ${rotated.y}px) scale(${scale})`
+            item.style.transform = `translate3d(${rotated.x}px, ${rotated.y}px, 0) scale(${scale})`
             item.style.opacity = opacity
             item.style.zIndex = Math.round(rotated.z + radius)
           }
@@ -324,9 +324,9 @@ const Skills = () => {
       <div className="container">
         <motion.div
           className="section-header"
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <h2 className="section-title">Skills</h2>
           <p className="section-subtitle">Technologies I work with</p>
@@ -334,9 +334,9 @@ const Skills = () => {
 
         <motion.div 
           className="globe-container"
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={{ opacity: 0, scale: 0.95 }}
           animate={isInView ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}

@@ -77,9 +77,9 @@ const Projects = () => {
     <section id="projects" className="projects" ref={ref}>
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <h2 className="section-title">Featured Projects</h2>
           <p className="section-subtitle">Some things I've built</p>
@@ -89,9 +89,9 @@ const Projects = () => {
           {/* Repositories Sidebar */}
           <motion.div 
             className="repositories-sidebar"
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
             <div className="sidebar-header">
               <FiFolder className="sidebar-icon" />
@@ -138,10 +138,10 @@ const Projects = () => {
                 <motion.div
                   key={index}
                   className="pinned-card"
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.5, delay: 0.3 + (index * 0.1) }}
-                  whileHover={{ y: -5 }}
+                  transition={{ duration: 0.3, delay: 0.15 + (index * 0.05), ease: 'easeOut' }}
+                  whileHover={{ y: -3 }}
                 >
                   <div className="pinned-card-header">
                     <div className="pinned-card-title">

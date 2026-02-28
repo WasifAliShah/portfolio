@@ -45,9 +45,9 @@ const Contact = () => {
     <section id="contact" className="contact" ref={ref}>
       <div className="container">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
         >
           <h2 className="section-title">Get In Touch</h2>
         </motion.div>
@@ -55,9 +55,9 @@ const Contact = () => {
         <div className="contact-content">
           <motion.div 
             className="contact-info"
-            initial={{ opacity: 0, x: -30 }}
+            initial={{ opacity: 0, x: -20 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
           >
             <h3>Let's talk about everything!</h3>
             <p>

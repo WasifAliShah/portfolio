@@ -4,6 +4,7 @@
   min-height: 700px;
   background: linear-gradient(180deg, rgba(10, 10, 20, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%);
   overflow: hidden;
+  contain: layout style;
 }
 
 /* Particles background */
@@ -15,6 +16,7 @@
   height: 100%;
   pointer-events: none;
   overflow: hidden;
+  contain: strict;
 }
 
 .particle {
@@ -22,23 +24,25 @@
   background: var(--primary);
   border-radius: 50%;
   animation: floatParticle linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 @keyframes floatParticle {
   0% {
-    transform: translateY(0) translateX(0);
+    transform: translateY(0) translateX(0) translateZ(0);
   }
   25% {
-    transform: translateY(-20px) translateX(10px);
+    transform: translateY(-20px) translateX(10px) translateZ(0);
   }
   50% {
-    transform: translateY(-10px) translateX(-5px);
+    transform: translateY(-10px) translateX(-5px) translateZ(0);
   }
   75% {
-    transform: translateY(-30px) translateX(5px);
+    transform: translateY(-30px) translateX(5px) translateZ(0);
   }
   100% {
-    transform: translateY(0) translateX(0);
+    transform: translateY(0) translateX(0) translateZ(0);
   }
 }
 
@@ -111,7 +115,10 @@
   pointer-events: auto;
   will-change: transform, opacity;
   cursor: pointer;
-  transition: filter 0.2s ease;
+  transition: filter 0.15s ease-out;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout style;
 }
 
 .skill-item:hover {
@@ -119,19 +126,21 @@
 }
 
 .skill-item:hover .skill-icon {
-  transform: scale(1.4);
+  transform: scale(1.4) translateZ(0);
   filter: drop-shadow(0 0 25px currentColor) drop-shadow(0 0 40px currentColor);
 }
 
 .skill-item:hover .skill-name {
-  transform: scale(1.1);
+  transform: scale(1.1) translateZ(0);
   color: #fff;
 }
 
 .skill-icon {
   font-size: 3rem;
   filter: drop-shadow(0 0 15px currentColor);
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: transform 0.15s ease-out, filter 0.15s ease-out;
+  transform: translateZ(0);
+  will-change: transform, filter;
 }
 
 .skill-name {
@@ -140,7 +149,8 @@
   color: var(--light);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition: transform 0.15s ease-out, color 0.15s ease-out;
+  transform: translateZ(0);
 }
 
 .globe-hint {
